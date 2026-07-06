@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing URL Detector - Diagnostic Utility</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>Phishing URL Detector</h1>
+                <p class="subtitle">Offline diagnostic security utility analyzing raw URLs using a regularized RandomForest classifier.</p>
+            </div>
+        </header>
+        
+        <section class="form-card">
+            <h2 class="section-label">Input Target URL</h2>
+            <form method="POST" action="/">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        id="url-input" 
+                        name="url" 
+                        placeholder="e.g. security-login-confirm.com/signin or google.com" 
+                        required 
+                        value="{{ prediction.url if prediction and prediction.url else '' }}"
+                        class="form-control"
+                        autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="off"
+                        spellcheck="false"
+                    >
+                </div>
+                <button type="submit" id="submit-btn" class="btn">Analyze URL</button>
+            </form>
+        </section>
+
+        {% if prediction %}
+            <section class="result-card slide-up">
+                {% if prediction.error %}
+                    <div class="alert alert-error">
+                        <strong>Error:</strong> {{ prediction.error }}
+                    </div>
+                {% else %}
+                    <div class="result-header">
+                        <h2 class="section-label">Prediction Result</h2>
+                        <div class="prediction-summary">
+                            {% if prediction.is_phishing %}
+                                <span class="badge badge-phishing">
+                                    <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    PHISHING
+                                </span>
+                            {% else %}
+                                <span class="badge badge-legitimate">
+                                    <svg class="icon" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    LEGITIMATE
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="confidence-indicator">
+                        <div class="confidence-meta">
+                            <span>Model Confidence:</span>
+                            <strong>{{ prediction.confidence }}</strong>
+                        </div>
+                        <div class="meter">
+                            <div 
+                                class="meter-bar {% if prediction.is_phishing %}meter-phishing{% else %}meter-legitimate{% endif %}" 
+                                style="width: {{ prediction.confidence }}"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="features-breakdown">
+                        <h2 class="section-label">Extracted Lexical & Structural Features</h2>
+                        <table class="features-table">
+                            <thead>
+                                <tr>
+                                    <th>Feature Attribute</th>
+                                    <th class="value-header">Extracted Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for name, val in prediction.features %}
+                                    <tr>
+                                        <td class="feature-name">{{ name }}</td>
+                                        <td class="value-column">{{ val }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
+    </main>
+
+    <script>
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                const btn = document.getElementById('submit-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = 'Analyzing URL<span class="pulse-dot">.</span><span class="pulse-dot">.</span><span class="pulse-dot">.</span>';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

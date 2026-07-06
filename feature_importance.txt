@@ -1,0 +1,18 @@
+Feature Importances Ranked from Most to Least Important:
+------------------------------------------------------------
+                       Feature  Importance
+         count_hyphens_in_path    0.300448
+  has_suspicious_words_in_path    0.172339
+         digit_ratio_in_domain    0.140763
+                    count_dots    0.118217
+                    url_length    0.105979
+                    path_depth    0.057300
+                        has_ip    0.025797
+       count_hyphens_in_domain    0.025506
+              count_subdomains    0.022113
+               count_at_symbol    0.011805
+has_suspicious_words_in_domain    0.009553
+               has_port_number    0.004926
+     has_double_slash_redirect    0.003570
+                  is_shortened    0.001685
+                     has_https    0.000000
